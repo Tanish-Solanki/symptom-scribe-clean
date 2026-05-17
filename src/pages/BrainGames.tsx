@@ -18,11 +18,12 @@ const BrainGames = () => {
   const [mathQuestion, setMathQuestion] = useState({ num1: 0, num2: 0, answer: 0 });
   const [mathScore, setMathScore] = useState(0);
   const [wordSequence, setWordSequence] = useState<string[]>([]);
-  const [userSequence, setUserSequence] = useState<string[]>([]);
+  const [userSequence, setUserSequence] = useState<{ word: string; index: number }[]>([]);
+  const [wordPhase, setWordPhase] = useState<"memorize" | "recall">("memorize");
   const { toast } = useToast();
 
   const healthWords = [
-    "Heart", "Brain", "Vitamin", "Exercise", "Nutrition", "Sleep", 
+    "Heart", "Brain", "Vitamin", "Exercise", "Nutrition", "Sleep",
     "Wellness", "Fitness", "Immune", "Cardio", "Protein", "Hydration"
   ];
 
@@ -45,16 +46,20 @@ const BrainGames = () => {
     for (let i = 0; i < 5; i++) {
       sequence.push(healthWords[Math.floor(Math.random() * healthWords.length)]);
     }
+
     setWordSequence(sequence);
     setUserSequence([]);
+    setWordPhase("memorize");
     setActiveGame("word");
-    
+
     toast({
       title: "Memorize these words!",
       description: "You have 10 seconds...",
     });
 
     setTimeout(() => {
+      setWordPhase("recall");
+
       toast({
         title: "Time's up!",
         description: "Now recall the words in order",
@@ -81,7 +86,7 @@ const BrainGames = () => {
       if (memoryCards[first] === memoryCards[second]) {
         setMatchedCards([...matchedCards, first, second]);
         setFlippedCards([]);
-        
+
         if (matchedCards.length + 2 === memoryCards.length) {
           toast({
             title: "🎉 Congratulations!",
@@ -160,7 +165,7 @@ const BrainGames = () => {
           {games.map((game) => {
             const Icon = game.icon;
             return (
-              <Card 
+              <Card
                 key={game.id}
                 className="group hover:shadow-glow transition-all duration-300 cursor-pointer border-2"
                 onClick={() => {
@@ -177,7 +182,7 @@ const BrainGames = () => {
                   <CardDescription>{game.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button 
+                  <Button
                     className="w-full"
                     disabled={game.id === "pattern"}
                   >
@@ -207,11 +212,10 @@ const BrainGames = () => {
                 <div
                   key={index}
                   onClick={() => handleCardClick(index)}
-                  className={`aspect-square rounded-xl flex items-center justify-center text-4xl font-bold cursor-pointer transition-all ${
-                    flippedCards.includes(index) || matchedCards.includes(index)
-                      ? "bg-gradient-to-br from-primary to-primary-glow text-white rotate-0"
-                      : "bg-muted hover:bg-accent rotate-180"
-                  }`}
+                  className={`aspect-square rounded-xl flex items-center justify-center text-4xl font-bold cursor-pointer transition-all ${flippedCards.includes(index) || matchedCards.includes(index)
+                    ? "bg-gradient-to-br from-primary to-primary-glow text-white rotate-0"
+                    : "bg-muted hover:bg-accent rotate-180"
+                    }`}
                 >
                   {(flippedCards.includes(index) || matchedCards.includes(index)) && (
                     <span>{["🫀", "🧠", "💊", "🏃"][card]}</span>
@@ -276,7 +280,7 @@ const BrainGames = () => {
               <div className="p-6 bg-accent rounded-xl">
                 <h3 className="text-lg font-semibold mb-4">Words to memorize:</h3>
                 <div className="flex flex-wrap gap-3">
-                  {wordSequence.map((word, idx) => (
+                  {wordPhase === "memorize" && wordSequence.map((word, idx) => (
                     <div
                       key={idx}
                       className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold text-lg"
@@ -294,11 +298,10 @@ const BrainGames = () => {
                       key={idx}
                       variant="outline"
                       onClick={() => {
-                        if (userSequence.length < wordSequence.length) {
-                          setUserSequence([...userSequence, word]);
-                        }
+                        if (wordPhase !== "recall") return;
+
+                        setUserSequence([...userSequence, { word, index: userSequence.length }]);
                       }}
-                      disabled={userSequence.includes(word)}
                     >
                       {word}
                     </Button>
@@ -314,7 +317,7 @@ const BrainGames = () => {
                         key={idx}
                         className="px-6 py-3 bg-secondary text-secondary-foreground rounded-lg font-semibold"
                       >
-                        {word}
+                        {word.word}
                       </div>
                     ))}
                   </div>
@@ -323,11 +326,13 @@ const BrainGames = () => {
               <div className="flex gap-4">
                 <Button
                   onClick={() => {
-                    const correct = JSON.stringify(wordSequence) === JSON.stringify(userSequence);
+                    const correct =
+                      wordSequence.length === userSequence.length &&
+                      wordSequence.every((word, i) => word === userSequence[i].word);
                     toast({
                       title: correct ? "🎉 Perfect!" : "❌ Not quite",
-                      description: correct 
-                        ? "You recalled all words correctly!" 
+                      description: correct
+                        ? "You recalled all words correctly!"
                         : "Try again or start a new game",
                       variant: correct ? "default" : "destructive",
                     });
