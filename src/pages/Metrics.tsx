@@ -70,8 +70,6 @@ const Metrics = () => {
   const [diastolic, setDiastolic] = useState("");
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
-  const [history, setHistory] = useState<MetricEntry[]>([]);
-  const [historyLoading, setHistoryLoading] = useState(false);
   const { toast } = useToast();
   const [historyUserId, setHistoryUserId] = useState("");
 
@@ -138,7 +136,7 @@ const Metrics = () => {
       setNotes("");
 
       // Refresh history to show the new entry with trend
-      fetchHistory();
+      refresh();
     } catch (error) {
       console.error("Error saving metric:", error);
       showError("Failed to Save", "Could not record your health metric");
