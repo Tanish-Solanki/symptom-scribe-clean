@@ -390,12 +390,12 @@ const Metrics = () => {
               <TableHeader>
                 
                 <TableRow>
-                  <TableHead>Actions</TableHead>
+                  
                   <TableHead>Date</TableHead>
                   <TableHead>Metric</TableHead>
                   <TableHead>Value</TableHead>
                   <TableHead>Notes</TableHead>
-        
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
 
