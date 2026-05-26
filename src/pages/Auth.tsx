@@ -59,6 +59,7 @@ const Auth = () => {
 
   const [loading, setLoading] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
   const { toast } = useToast();
