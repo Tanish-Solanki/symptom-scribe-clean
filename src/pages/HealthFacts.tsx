@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Sparkles, RefreshCw, BookOpen, Heart, Brain, Dna } from "lucide-react";
@@ -15,7 +15,7 @@ interface HealthFact {
 const HealthFacts = () => {
   const [currentFact, setCurrentFact] = useState<HealthFact | null>(null);
   const [factHistory, setFactHistory] = useState<HealthFact[]>([]);
-
+  const hasInitialized = useRef(false);
   const healthFacts: HealthFact[] = [
     {
       category: "Cardiovascular",
@@ -138,10 +138,17 @@ const HealthFacts = () => {
   };
 
   useEffect(() => {
+    if (hasInitialized.current) return;
+
+    hasInitialized.current = true;
+
     getRandomFact();
-    // Show welcome toast when page loads
-    showInfo("Welcome to Health Facts!", "Learn fascinating insights about the human body");
-  }, []);
+
+    showInfo(
+      "Welcome to Health Facts!",
+      "Explore fascinating health discoveries"
+      );
+    }, []);
 
   return (
     <div className="space-y-6">
