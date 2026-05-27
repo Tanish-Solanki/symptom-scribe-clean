@@ -19,6 +19,17 @@ interface TrendQuestion {
   correctAnswer: number;
   options: number[];
 }
+function shuffleArray<T>(array: T[]): T[] {
+  const arr = [...array];
+
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+
+  return arr;
+}
 
 const BrainGames = () => {
   const [activeGame, setActiveGame] = useState<string | null>(null);
@@ -393,10 +404,10 @@ const BrainGames = () => {
   };
 
   const startWordGame = () => {
-    const sequence = [];
-    for (let i = 0; i < 5; i++) {
-      sequence.push(healthWords[Math.floor(Math.random() * healthWords.length)]);
-    }
+    const sequence = shuffleArray([...healthWords]).slice(
+      0,
+    Math.min(5, healthWords.length)
+    );
 
     setWordSequence(sequence);
     setUserSequence([]);
